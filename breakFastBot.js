@@ -8,6 +8,8 @@ const TeleBot = require('telebot');
 const bot = new TeleBot(botData.bot);
 const groupId = botData.group;
 
+const groupName = "BreafastClub";
+
 const days = [
                 "monday",
                 "tuesday",
@@ -18,7 +20,8 @@ const days = [
 
 var breakfastData = {
     'day': 'friday',
-    'joiners': []
+    'joiners': [],
+    'team': []
 };
 
 loadData();
@@ -27,6 +30,8 @@ bot.on('/when', (msg)=>{when(msg)});
 bot.on('/join', (msg)=>{addJoiner(msg);});
 bot.on('/joiners', (msg)=>{printJoiners(msg)});
 bot.on(/^\/setday (.+)$/, (msg, props)=>{setDay(msg, props)});
+bot.on('/pickteam',(msg)=>{pickTeam(_msg)});
+bot.on('/showteam',(msg)=>{showTeam(_msg)});
 bot.on('/help', (msg)=>{printHelp(msg)});
 bot.on('/hidebuttons', (msg)=>{hideButtons(msg)});
 bot.on('/test', (msg=>{test(msg)}));
@@ -47,10 +52,10 @@ function addJoiner(_msg){
     var _id = _msg.from.id;
     if(!isIdJoining(_id)){
         var _name = _msg.from.username;
-        if(_name==undefined){
+        if(_name==undefined || _name=="undefined" || _name==""){
             _name = _msg.from.first_name;
         }
-        if(_name==undefined){
+        if(_name==undefined || _name=="undefined" || _name==""){
             _name = '🦄';
         }
         var _j = {'id':_id, 'username':_name};
@@ -101,6 +106,7 @@ function setDay(_msg, _props){
         breakfastData.day = _day;
         _msg.reply.text("Ok, I set the breakfast day to "+_theDay);
         saveData();
+        setTitle();
     }else{
         var _txt = "Sorry, I cannot set the breakfast day to "+_day+". Good days would be:\n";
         for(var i=0;i<days.length;i++){
@@ -117,12 +123,90 @@ function isGoodDay(_day){
     return false;
 }
 
+function pickTeam(_msg){
+    if(!isFromGroup(_msg))return;
+    clearTeam();
+    switch(breakfastData.joiners.length){
+        case 0:
+            _msg.reply.text("There are no joiners yet: cannot pick a team until someone joins the breakfast");
+            break;
+        case 1:
+            addToTeam(breakfastData.joiners[0]);
+            _msg.reply.text("Only "+joiners[0].username+" joined the breakfast. Guess who's gonna prepare?");
+            saveData();
+            showTeam(_msg);
+            setTitle();
+            break;
+        case 2:
+            addToTeam(breakfastData.joiners[0]);
+            addToTeam(breakfastData.joiners[1]);
+            saveData();
+            _msg.reply.text("Only 2 people joined the breakfast: I think they should both be their own team.");
+            showTeam(_msg);
+            setTitle();
+            break;
+        default:
+            let _clone = breakfastData.joiners.slice();
+            breakfastData.team.push(pickRandomJoiner(_clone, true));
+            breakfastData.team.push(pickRandomJoiner(_clone, true));
+            saveData();
+            showTeam(_msg);
+            setTitle();
+            break;
+    }
+}
+
+function clearTeam(){
+    breakfastData.team = [];
+    saveData();
+}
+
+function addToTeam(_joiner){
+    breakfastData.team.push(_joiner);
+}
+
+function pickRandomJoiner(_joiners, _bRemove){
+    var _r = Math.floor(Math.random()*_joiners.length);
+    var _j = {"id": _joiners[_r].id, "username": _joiners[_r].username};
+    if(_bRemove){
+        _joiners.splice(_r,1);
+    }
+    return _j;
+}
+
+function showTeam(_msg){
+    if(!isFromGroup(_msg))return;
+    if(breakfastData.team.length==0){
+        _msg.reply.text("No team selected yet.");
+        return;
+    }
+    var _txt = "This week breakfast will be prepared by this awesome team:\n";
+    for(var i=0;i<breakfastData.team.length;i++){
+        _txt += "  "+breakfastData.team[i]+"\n";
+    }
+    _msg.reply.text(_txt);
+}
+
+function setTitle(){
+    var _txt = groupName+" - ";
+    _txt+="breakfast is next "+breakfastData.when;
+    if(breakfastData.team.length>0){
+        _txt+=" and it will organized by "+breakfastData.team[0].username;
+        if(breakfastData.team.length>1){
+            _txt+=" and "+breakfastData.team[1].username; 
+        }
+    }
+    bot.setChatTitle(botData.group, groupName+" - ");
+}
+
 function printHelp(_msg){
     var _txt = "These are the commands I will accept:\n";
     _txt += "/when returns the day of the next breakfast\n";
     _txt += "/join will sign you in for next breakfast\n";
     _txt += "/joiners will print a list of all the people joining next breakfast\n";
     _txt += "/setday [day] allows you to set the day for next breakfast\n";
+    _txt += "/pickteam selects 2 random people to organize next breakfast\n";
+    _txt += "/showteam shows the 2 people organizing the next breakfast\n";
 
     return bot.sendMessage(_msg.from.id, _txt, {mainKbd});
 }
