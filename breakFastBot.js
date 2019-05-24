@@ -104,7 +104,7 @@ function setDay(_msg, _props){
     if(_day==undefined || _day=="")return
     if(isGoodDay(_day)){
         breakfastData.day = _day;
-        _msg.reply.text("Ok, I set the breakfast day to "+_theDay);
+        _msg.reply.text("Ok, I set the breakfast day to "+breakfastData.day);
         saveData();
         setTitle();
     }else{
