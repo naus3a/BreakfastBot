@@ -20,6 +20,8 @@ var breakfastData = {
 
 loadData();
 
+ensureOnlyGroupMembersCanJoin();
+
 bot.on('/when', msg => {
   when(msg);
 });
@@ -64,12 +66,10 @@ var mainKbd = bot.keyboard(
 );
 
 function when(_msg) {
-  if (!isFromGroup(_msg)) return;
   _msg.reply.text("This week we're having breakfast on " + breakfastData.day);
 }
 
 function addJoiner(_msg) {
-  if (!isFromGroup(_msg)) return;
   var _id = _msg.from.id;
   if (!isIdJoining(_id)) {
     var _name = _msg.from.username;
@@ -98,7 +98,6 @@ function isIdJoining(_id) {
 }
 
 function printJoiners(_msg) {
-  if (!isFromGroup(_msg)) return;
   var _txt =
     'This week we have ' + breakfastData.joiners.length + ' people joining:\n';
   for (var i = 0; i < breakfastData.joiners.length; i++) {
@@ -123,7 +122,6 @@ function isFromGroup(_msg) {
 }
 
 function setDay(_msg, _props) {
-  if (!isFromGroup(_msg)) return;
   var _day = _props.match[1];
   if (_day == undefined || _day == '') return;
   if (isGoodDay(_day)) {
@@ -151,7 +149,6 @@ function isGoodDay(_day) {
 }
 
 function pickTeam(_msg) {
-  if (!isFromGroup(_msg)) return;
   clearTeam();
   switch (breakfastData.joiners.length) {
     case 0:
@@ -210,7 +207,6 @@ function pickRandomJoiner(_joiners, _bRemove) {
 }
 
 function showTeam(_msg) {
-  if (!isFromGroup(_msg)) return;
   if (breakfastData.team.length == 0) {
     _msg.reply.text('No team selected yet.');
     return;
@@ -262,4 +258,18 @@ function loadData() {
 function saveData() {
   let rawData = JSON.stringify(breakfastData);
   fs.writeFileSync('data.json', rawData);
+}
+
+function ensureOnlyGroupMembersCanJoin() {
+  let oldOn = TeleBot.prototype.on;
+  TeleBot.prototype.on = function on(types, fn, opt) {
+    var fnWithGroupCheck = fn;
+    if (fnWithGroupCheck) {
+      fnWithGroupCheck = function() {
+        if (!isFromGroup(arguments[0])) return;
+        fn.apply(null, arguments);
+      };
+    }
+    oldOn.apply(this, [types, fnWithGroupCheck, opt]);
+  };
 }
