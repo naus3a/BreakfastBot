@@ -22,7 +22,20 @@
     "url": "https://github.com/naus3a/BreakfastBot/issues"
   },
   "homepage": "https://github.com/naus3a/BreakfastBot#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "prettier": {
+    "singleQuote": true
+  },
   "dependencies": {
     "telebot": "^1.2.6"
+  },
+  "devDependencies": {
+    "husky": "^2.3.0",
+    "prettier": "^1.17.1",
+    "pretty-quick": "^1.11.0"
   }
 }
