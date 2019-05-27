@@ -61,9 +61,9 @@ function addJoiner(_msg){
         var _j = {'id':_id, 'username':_name};
         breakfastData.joiners.push(_j);
         saveData();
-        _msg.reply.text("I logged you in, "+_msg.from.username); 
+        _msg.reply.text("I logged you in, "+_name); 
     }else{
-        _msg.reply.text("You're already on the list, "+_msg.from.username);
+        _msg.reply.text("You're already on the list, "+_name);
     }
 }
 
