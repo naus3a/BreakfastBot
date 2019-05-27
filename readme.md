@@ -1,3 +1,4 @@
 # what you need:
-* `npm install telebot`
-* a `botData.json` file with bot and group ids.
+
+- `npm ci`
+- a `botData.json` file with bot and group ids.
