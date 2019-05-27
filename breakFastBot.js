@@ -196,7 +196,7 @@ function setTitle(){
             _txt+=" and "+breakfastData.team[1].username; 
         }
     }
-    bot.setChatTitle(botData.group, groupName+" - ");
+    bot.setChatTitle(botData.group, _txt);
 }
 
 function printHelp(_msg){
