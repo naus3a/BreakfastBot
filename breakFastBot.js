@@ -189,7 +189,7 @@ function showTeam(_msg){
 
 function setTitle(){
     var _txt = groupName+" - ";
-    _txt+="breakfast is next "+breakfastData.when;
+    _txt+="breakfast is next "+breakfastData.day;
     if(breakfastData.team.length>0){
         _txt+=" and it will organized by "+breakfastData.team[0].username;
         if(breakfastData.team.length>1){
