@@ -1,0 +1,42 @@
+{
+  "name": "breakfastbot",
+  "version": "1.0.0",
+  "description": "telegram bot for organizing xrs/fjord/ls breakfasts",
+  "main": "breakFastBot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon breakFastBot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naus3a/BreakfastBot.git"
+  },
+  "keywords": [
+    "breakfast",
+    "bot",
+    "telegram"
+  ],
+  "author": "naus3a, XRS + LS team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/naus3a/BreakfastBot/issues"
+  },
+  "homepage": "https://github.com/naus3a/BreakfastBot#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "prettier": {
+    "singleQuote": true
+  },
+  "dependencies": {
+    "telebot": "^1.2.6"
+  },
+  "devDependencies": {
+    "husky": "^2.3.0",
+    "nodemon": "^1.19.1",
+    "prettier": "^1.17.1",
+    "pretty-quick": "^1.11.0"
+  }
+}
